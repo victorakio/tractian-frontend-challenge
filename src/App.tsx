@@ -1,25 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { api } from "./services/api";
+import { GlobalStyle } from "./styles/global";
 
 function App() {
+  useEffect(() => {
+    api.get("db").then((data) => console.log(data.data.companies));
+  }, []);
+
+  const handleCreateCompany = async () => {
+    await api
+      .put("companies/1", {
+        company: {
+          name: "Awesome Entry",
+        },
+      })
+      .then((response) => console.log(response.data));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <h1>Hello Tractian</h1>
+      <button onClick={handleCreateCompany}>Create Company</button>
+      <GlobalStyle />
+    </>
   );
 }
 
