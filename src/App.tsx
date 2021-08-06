@@ -1,45 +1,18 @@
-import { useState, useEffect } from "react";
-import { FaIndustry } from "react-icons/fa";
-
-import { api } from "./services/api";
+import { BrowserRouter, Route } from "react-router-dom";
 
 import { GlobalStyle } from "./styles/global";
 
-interface Company {
-  id: number;
-  name: string;
-}
+import Company from "./pages/Company/index";
+import Home from "./pages/Home/index";
 
 function App() {
-  const [companies, setCompanies] = useState<Company[]>([]);
-
-  useEffect(() => {
-    api.get("companies").then((response) => setCompanies(response.data));
-  }, []);
-
-  const handleCreateCompany = async () => {
-    await api
-      .put("companies/1", {
-        company: {
-          name: "Awesome Entry",
-        },
-      })
-      .then((response) => console.log(response.data));
-  };
-
   return (
-    <>
-      <FaIndustry />
-      <h1>Companies</h1>
-      <button onClick={handleCreateCompany}>Create Company</button>
-      <ul>
-        {companies.map((company) => (
-          <li key={company.id}>{company.name}</li>
-        ))}
-      </ul>
+    <BrowserRouter>
+      <Route path="/" exact component={Home} />
+      <Route path="/company/:companyId" component={Company} />
 
       <GlobalStyle />
-    </>
+    </BrowserRouter>
   );
 }
 
