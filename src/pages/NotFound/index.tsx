@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 
+import './styles.scss';
+
 function NotFound() {
   return (
-    <>
-      <h1>Page not found!</h1>
+    <main className="notFoundContainer">
+      <h1>Página não encontrada</h1>
+
+      <p>Verifique se o endereço da página está correto e tente novamente.</p>
       <Link to="/">Voltar para a Home</Link>
-    </>
+    </main>
   );
 }
 

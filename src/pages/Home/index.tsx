@@ -4,13 +4,6 @@ import { Link } from "react-router-dom";
 import { api } from "../../services/api";
 
 import logo from "../../assets/logo-tractian.svg";
-import {
-  CompaniesHeader,
-  CompaniesList,
-  CompanySelector,
-  HomeContainer,
-  Logo,
-} from "./styles";
 
 interface Company {
   id: number;
@@ -35,28 +28,7 @@ function Home() {
   };
 
   return (
-    <HomeContainer>
-      <Logo src={logo} alt="logo" width="250" />
-      <CompanySelector>
-        <CompaniesHeader>
-          <h1>Empresas</h1>
-          <button onClick={handleCreateCompany}>
-            <FaPlusCircle />
-            Registrar Empresa
-          </button>
-        </CompaniesHeader>
-
-        <CompaniesList>
-          {companies.map((company) => (
-            <li key={company.id}>
-              <Link to={`/company/${company.id}`}>
-                <strong>{company.name}</strong>
-              </Link>
-            </li>
-          ))}
-        </CompaniesList>
-      </CompanySelector>
-    </HomeContainer>
+    <h2>Home</h2>
   );
 }
 

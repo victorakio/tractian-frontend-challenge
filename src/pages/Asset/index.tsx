@@ -21,15 +21,15 @@ import {
   SettingOutlined,
   TagOutlined,
   HomeOutlined,
-  AlertOutlined,
-  CheckCircleOutlined,
-  StopOutlined,
   ThunderboltOutlined,
   FireOutlined,
   ReloadOutlined,
   EditOutlined,
 } from "@ant-design/icons";
+
 import { api } from "../../services/api";
+
+import { formatStatus } from '../../utils/formatStatus';
 
 import "./styles.scss";
 highchartsMore(Highcharts);
@@ -120,25 +120,28 @@ function Asset() {
     console.log(`selected ${value}`);
   }
 
-  let statusIcon;
-  let formatedStatus;
+  // let statusIcon;
+  // let formatedStatus;
 
-  switch (asset?.status) {
-    case "inAlert":
-      statusIcon = <AlertOutlined />;
-      formatedStatus = "Em Alerta";
-      break;
-    case "inDowntime":
-      statusIcon = <StopOutlined />;
-      formatedStatus = "Em Parada";
-      break;
-    case "inOperation":
-      statusIcon = <CheckCircleOutlined />;
-      formatedStatus = "Ativo";
-      break;
-    case "default":
-      break;
-  }
+  // switch (asset?.status) {
+  //   case "inAlert":
+  //     statusIcon = <AlertOutlined />;
+  //     formatedStatus = "Em Alerta";
+  //     break;
+  //   case "inDowntime":
+  //     statusIcon = <StopOutlined />;
+  //     formatedStatus = "Em Parada";
+  //     break;
+  //   case "inOperation":
+  //     statusIcon = <CheckCircleOutlined />;
+  //     formatedStatus = "Ativo";
+  //     break;
+  //   case "default":
+  //     break;
+  // }
+
+  const formatedStatus = asset && formatStatus(asset.status);
+
 
   console.log(asset);
   const options = {
@@ -300,7 +303,7 @@ function Asset() {
                 {asset?.model}
               </p>
               <p className={`asset${asset?.status}`}>
-                <strong>{statusIcon} Status: </strong> {formatedStatus}
+                <strong>{formatedStatus?.statusIcon} Status: </strong> {formatedStatus?.formatedStatus}
               </p>
               <p>
                 <strong>
