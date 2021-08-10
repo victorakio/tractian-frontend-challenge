@@ -1,0 +1,30 @@
+.assetsContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+  }
+
+  .assetList {
+    gap: 2rem;
+  }
+
+  .assetCard {
+    width: 25rem;
+    display: flex;
+    border: 0.2rem solid var(--blue-500);
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+
+    img {
+      width: 10rem;
+      height: 10rem;
+      object-fit: cover;
+      margin-right: 1rem;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaIndustry } from "react-icons/fa";
+import { FaPlusCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { api } from "../../services/api";
 
@@ -39,11 +39,11 @@ function Home() {
       <Logo src={logo} alt="logo" width="250" />
       <CompanySelector>
         <CompaniesHeader>
-          <h1>
-            <FaIndustry />
-            Companies
-          </h1>
-          <button onClick={handleCreateCompany}>Create Company</button>
+          <h1>Empresas</h1>
+          <button onClick={handleCreateCompany}>
+            <FaPlusCircle />
+            Registrar Empresa
+          </button>
         </CompaniesHeader>
 
         <CompaniesList>

@@ -1,0 +1,56 @@
+.ant-col {
+  border: 1px solid #999;
+  border-radius: 2rem;
+  padding: 2rem;
+}
+
+.assetContainer {
+  gap: 4rem;
+}
+
+.generalInfoContainer {
+  display: flex;
+  flex-direction: column;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  & > div {
+    display: flex;
+
+    img {
+      width: 25rem;
+      height: 25rem;
+      object-fit: cover;
+      margin-right: 2rem;
+    }
+
+    p {
+      margin-bottom: 0.8rem;
+    }
+  }
+}
+
+.assetinOperation {
+  color: green;
+}
+
+.assetinAlert {
+  color: red;
+}
+
+.assetinDowntime {
+  color: gray;
+}
+
+.solidgaugeContainer {
+  display: flex;
+  justify-content: center;
+
+  svg {
+    width: 40rem;
+  }
+}
