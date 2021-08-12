@@ -52,8 +52,8 @@ function Users() {
     });
   };
 
-  const handleFinishFailCreateUserModal = () => {
-    message.error("Operação falhou.");
+  const handleFinishFailCreateUserModal = (errorInfo: any) => {
+    message.error("Erro:", errorInfo);
   };
 
   const handleDeleteUser = (id: number) => {

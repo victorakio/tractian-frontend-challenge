@@ -1,7 +1,6 @@
 import { Modal, Form, Input, Button, Select } from "antd";
-import { useEffect } from "react";
-import { useState } from "react";
-import { api } from "../../services/api";
+import { useComapnies } from "../../hooks/useCompanies";
+import { useUnits } from "../../hooks/useUnits";
 
 interface userProps {
   id: number;
@@ -16,18 +15,8 @@ interface NewUserModalProps {
   onOkFunction: () => void;
   onCancelFunction: () => void;
   onFinishFunction: (values: userProps) => void;
-  onFinishFailFunction: () => void;
+  onFinishFailFunction: (errorInfo: any) => void;
   form: any;
-}
-
-interface UnitProps {
-  id: number;
-  name: string;
-}
-
-interface CompanyProps {
-  id: number;
-  name: string;
 }
 
 function NewUserModal({
@@ -38,16 +27,9 @@ function NewUserModal({
   onFinishFailFunction,
   form,
 }: NewUserModalProps) {
-  const [companies, setCompanies] = useState<CompanyProps[]>([]);
-  const [units, setUnits] = useState<UnitProps[]>([]);
-
+  const { companies } = useComapnies();
+  const { units } = useUnits();
   const { Option } = Select;
-
-  useEffect(() => {
-    api.get("companies").then((response) => setCompanies(response.data));
-
-    api.get("units").then((response) => setUnits(response.data));
-  }, []);
 
   return (
     <Modal visible={isVisible} onOk={onOkFunction} onCancel={onCancelFunction}>
@@ -85,7 +67,7 @@ function NewUserModal({
           name="unitId"
           rules={[{ required: true, message: "Selecione uma unidade." }]}
         >
-          <Select showSearch style={{ width: 200 }} placeholder="Unidade">
+          <Select showSearch placeholder="Unidade">
             {units.map((unit) => (
               <Option key={unit.id} value={unit.id}>
                 {unit.name}

@@ -1,0 +1,29 @@
+.companyGeneralInfo {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4rem;
+
+  .alertAssetsContainer {
+    display: grid;
+    justify-content: center;
+
+    .alertAssets {
+      display: flex;
+      margin-top: 2rem;
+
+      .inAlert {
+        margin-right: 4rem;
+        border-right: 0.1rem solid #666;
+        padding-right: 4rem;
+      }
+    }
+
+    strong {
+      margin-bottom: 2rem;
+    }
+
+    ul {
+      list-style: none;
+    }
+  }
+}

@@ -6,11 +6,14 @@
 
 .assetContainer {
   gap: 4rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .generalInfoContainer {
   display: flex;
   flex-direction: column;
+  justify-content: space-around;
 
   header {
     display: flex;
@@ -20,6 +23,7 @@
 
   & > div {
     display: flex;
+    margin-bottom: 2rem;
 
     img {
       width: 25rem;
@@ -30,6 +34,10 @@
 
     p {
       margin-bottom: 0.8rem;
+
+      strong {
+        margin-right: 0.5rem;
+      }
     }
   }
 }
@@ -46,11 +54,32 @@
   color: gray;
 }
 
-.solidgaugeContainer {
-  display: flex;
-  justify-content: center;
+.btnAddResponsible {
+  margin-bottom: 2rem;
+}
 
-  svg {
-    width: 40rem;
+.metricsContainer {
+  display: flex;
+  flex-direction: column;
+
+  .uptimeContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    color: #444;
+
+    .uptime {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lastUptimeCheck {
+      display: flex;
+      flex-direction: column;
+    }
+
+    & + hr {
+      margin-bottom: 2rem;
+    }
   }
 }

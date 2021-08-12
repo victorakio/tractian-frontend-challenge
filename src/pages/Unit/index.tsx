@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Form, message, Table, Space, Button, Collapse } from 'antd';
-import { api } from '../../services/api';
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { Form, message, Table, Space, Button, Collapse } from "antd";
+import { api } from "../../services/api";
 
-import PageHeader from '../../components/PageHeader';
-import NewUnitModal from '../../components/NewUnitModal';
-import AssetList from '../../components/AssetsList';
-
+import PageHeader from "../../components/PageHeader";
+import AssetList from "../../components/AssetsList";
+import EditUnitModal from "../../components/EditUnitModal";
 
 interface unitParams {
   unitId: string;
@@ -40,8 +39,7 @@ function Unit() {
   const [assets, setAssets] = useState<assetProps[]>([]);
   const [users, setUsers] = useState<userProps[]>([]);
   const { unitId } = useParams<unitParams>();
-  const [isCreateUnitModalVisible, setIsCreateUnitModalVisible] =
-    useState(false);
+  const [isEditUnitModalVisible, setIsEditUnitModalVisible] = useState(false);
 
   const [form] = Form.useForm();
   const { Column } = Table;
@@ -49,30 +47,38 @@ function Unit() {
 
   useEffect(() => {
     api.get(`units/${unitId}`).then((response) => setUnit(response.data));
-    api.get('assets').then((response) => setAssets(response.data));
-    api.get('users').then((response) => setUsers(response.data));
+    api.get("assets").then((response) => setAssets(response.data));
+    api.get("users").then((response) => setUsers(response.data));
   }, [unitId]);
 
-  const usersFromCompany = users.filter((user) => user.companyId === unit?.companyId);
+  const usersFromCompany = users.filter(
+    (user) => user.companyId === unit?.companyId
+  );
 
-  const usersFromUnit = usersFromCompany.filter((user) => user.unitId === unit?.id);
+  const usersFromUnit = usersFromCompany.filter(
+    (user) => user.unitId === unit?.id
+  );
 
-  const assetsFromCompany = assets.filter((asset) => asset.companyId === unit?.companyId);
+  const assetsFromCompany = assets.filter(
+    (asset) => asset.companyId === unit?.companyId
+  );
 
-  const assetsFromUnit = assetsFromCompany.filter((asset) => asset.unitId === unit?.id);
+  const assetsFromUnit = assetsFromCompany.filter(
+    (asset) => asset.unitId === unit?.id
+  );
 
   const showModal = () => {
-    setIsCreateUnitModalVisible(true);
+    setIsEditUnitModalVisible(true);
     form.resetFields();
   };
 
   const handleOk = () => {
-    setIsCreateUnitModalVisible(false);
+    setIsEditUnitModalVisible(false);
     form.resetFields();
   };
 
   const handleCancel = () => {
-    setIsCreateUnitModalVisible(false);
+    setIsEditUnitModalVisible(false);
     form.resetFields();
   };
 
@@ -84,13 +90,13 @@ function Unit() {
     api.post("units", newUnit).then((response) => {
       console.log(response.data);
       message.success(`Unidade ${response.data.name} adicionada com sucesso!`);
-      setIsCreateUnitModalVisible(false);
+      setIsEditUnitModalVisible(false);
       form.resetFields();
     });
   };
 
-  const handleFinishFailCreateUserModal = () => {
-    message.error("Operação falhou.");
+  const handleFinishFailCreateUserModal = (errorInfo: any) => {
+    message.error("Erro:", errorInfo);
   };
 
   const handleDeleteUser = (id: number) => {
@@ -101,7 +107,7 @@ function Unit() {
 
   return (
     <>
-      {unit &&
+      {unit && (
         <>
           <PageHeader
             headerTitle={unit.name}
@@ -109,8 +115,9 @@ function Unit() {
             openModalFunction={showModal}
           />
 
-          <NewUnitModal
-            isVisible={isCreateUnitModalVisible}
+          <EditUnitModal
+            unitId={unitId}
+            isVisible={isEditUnitModalVisible}
             onOkFunction={handleOk}
             onCancelFunction={handleCancel}
             onFinishFunction={handleFinishCreateUserModal}
@@ -142,7 +149,10 @@ function Unit() {
                   key="delete"
                   render={(record) => (
                     <Space size="middle">
-                      <Button type="link" onClick={() => handleDeleteUser(record.id)}>
+                      <Button
+                        type="link"
+                        onClick={() => handleDeleteUser(record.id)}
+                      >
                         Excluir
                       </Button>
                     </Space>
@@ -152,7 +162,7 @@ function Unit() {
             </Panel>
           </Collapse>
         </>
-      }
+      )}
     </>
   );
 }

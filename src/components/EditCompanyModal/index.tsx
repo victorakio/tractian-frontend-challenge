@@ -1,11 +1,15 @@
-import { Modal, Form, Input, Button, Select } from "antd";
+import { Modal, Form, Input, Button } from "antd";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { api } from "../../services/api";
 
-interface UnitProps {
+interface CompanyProps {
   id: number;
   name: string;
-  companyId: number;
+}
+
+interface CompanyParams {
+  companyId: string;
 }
 
 interface CompanyProps {
@@ -17,48 +21,54 @@ interface EditCompanyModalProps {
   isVisible: boolean;
   onOkFunction: () => void;
   onCancelFunction: () => void;
-  onFinishFunction: (values: UnitProps) => void;
-  onFinishFailFunction: () => void;
+  onFinishFunction: (values: CompanyProps) => void;
+  onFinishFailFunction: (errorInfo: any) => void;
   form: any;
 }
 
-function EditCompanyModal({ isVisible,
+function EditCompanyModal({
+  isVisible,
   onOkFunction,
   onCancelFunction,
   onFinishFunction,
   onFinishFailFunction,
   form,
 }: EditCompanyModalProps) {
-  const [companies, setCompanies] = useState<CompanyProps[]>([]);
+  const [company, setCompany] = useState<CompanyProps>();
+
+  const { companyId } = useParams<CompanyParams>();
 
   useEffect(() => {
-    api.get("companies").then((response) => setCompanies(response.data));
-  }, []);
+    api
+      .get(`companies/${companyId}`)
+      .then((response) => setCompany(response.data));
+  }, [companyId]);
   return (
     <Modal visible={isVisible} onOk={onOkFunction} onCancel={onCancelFunction}>
-      <Form
-        onFinish={onFinishFunction}
-        onFinishFailed={onFinishFailFunction}
-        form={form}
-      >
-        <h2>Editar empresa</h2>
-
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Insira um Nome." }]}
+      <h2>Editar empresa</h2>
+      {company && (
+        <Form
+          onFinish={onFinishFunction}
+          onFinishFailed={onFinishFailFunction}
+          form={form}
         >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[{ required: true, message: "Insira um Nome." }]}
+            initialValue={company.name}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
     </Modal>
-
   );
 }
 

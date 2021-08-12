@@ -1,6 +1,5 @@
 import { Modal, Form, Input, Button, Select } from "antd";
-import { useEffect, useState } from "react";
-import { api } from "../../services/api";
+import { useComapnies } from "../../hooks/useCompanies";
 
 interface UnitProps {
   id: number;
@@ -8,34 +7,26 @@ interface UnitProps {
   companyId: number;
 }
 
-interface CompanyProps {
-  id: number;
-  name: string;
-}
-
 interface NewUnitModalProps {
   isVisible: boolean;
   onOkFunction: () => void;
   onCancelFunction: () => void;
   onFinishFunction: (values: UnitProps) => void;
-  onFinishFailFunction: () => void;
+  onFinishFailFunction: (errorInfo: any) => void;
   form: any;
 }
 
-function NewUnitModal({ isVisible,
+function NewUnitModal({
+  isVisible,
   onOkFunction,
   onCancelFunction,
   onFinishFunction,
   onFinishFailFunction,
   form,
 }: NewUnitModalProps) {
-  const [companies, setCompanies] = useState<CompanyProps[]>([]);
+  const { companies } = useComapnies();
 
   const { Option } = Select;
-
-  useEffect(() => {
-    api.get("companies").then((response) => setCompanies(response.data));
-  }, []);
   return (
     <Modal visible={isVisible} onOk={onOkFunction} onCancel={onCancelFunction}>
       <Form
@@ -58,7 +49,7 @@ function NewUnitModal({ isVisible,
           name="companyId"
           rules={[{ required: true, message: "Selecione uma empresa." }]}
         >
-          <Select showSearch style={{ width: 200 }} placeholder="Company">
+          <Select showSearch placeholder="Company">
             {companies.map((company) => (
               <Option key={company.id} value={company.id}>
                 {company.name}
@@ -74,7 +65,6 @@ function NewUnitModal({ isVisible,
         </Form.Item>
       </Form>
     </Modal>
-
   );
 }
 

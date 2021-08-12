@@ -1,38 +1,88 @@
-import { useState, useEffect } from "react";
-import { Form } from "antd";
-
-import { api } from "../../services/api";
+import { useState } from "react";
+import { Form, message } from "antd";
 
 import PageHeader from "../../components/PageHeader";
-import AssetList from '../../components/AssetsList';
+import AssetList from "../../components/AssetsList";
 
 import "./styles.scss";
+import { useAssets } from "../../hooks/useAssets";
+import NewAssetModal from "../../components/NewAssetModal";
+import { api } from "../../services/api";
 
-interface AssetProp {
-  id: number;
+interface AssetProps {
+  sensors: string[];
+  model: string;
   name: string;
-  image: string;
-  status: string;
+  power?: number;
+  maxTemp: number;
+  rpm?: number;
+  unitId: number;
+  companyId: number;
 }
 
 function Assets() {
-  const [assets, setAssets] = useState<AssetProp[]>([]);
-  const [isEditUnitModalVisible, setIsEditUnitModalVisible] = useState(false);
+  const { assets } = useAssets();
+
+  const [isCreateUnitModalVisible, setIsCreateUnitModalVisible] =
+    useState(false);
 
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    api.get("assets").then((response) => setAssets(response.data));
-  }, []);
-
   const showModal = () => {
-    setIsEditUnitModalVisible(true);
+    setIsCreateUnitModalVisible(true);
     form.resetFields();
+  };
+
+  const handleOk = () => {
+    setIsCreateUnitModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleCancel = () => {
+    setIsCreateUnitModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleFinishCreateAssetModal = (values: AssetProps) => {
+    const newAsset = {
+      sensors: values.sensors,
+      model: values.model,
+      name: values.name,
+      specifications: {
+        power: values.power,
+        maxTemp: values.maxTemp,
+        rpm: values.rpm,
+      },
+      unitId: values.unitId,
+      companyId: values.companyId,
+    };
+    api.post("assets", newAsset).then((response) => {
+      console.log(response.data);
+      message.success(`Ativo ${response.data.name} adicionado com sucesso!`);
+      setIsCreateUnitModalVisible(false);
+      form.resetFields();
+    });
+  };
+
+  const handleFinishFailCreateUserModal = (errorInfo: any) => {
+    message.error(`Erro: ${errorInfo}`);
   };
 
   return (
     <div className="assetsContainer">
-      <PageHeader headerTitle="Todos os Ativos" modalButtonText="Adicionar ativo" openModalFunction={showModal} />
+      <PageHeader
+        headerTitle="Todos os Ativos"
+        modalButtonText="Adicionar ativo"
+        openModalFunction={showModal}
+      />
+      <NewAssetModal
+        isVisible={isCreateUnitModalVisible}
+        onOkFunction={handleOk}
+        onCancelFunction={handleCancel}
+        onFinishFunction={handleFinishCreateAssetModal}
+        onFinishFailFunction={handleFinishFailCreateUserModal}
+        form={form}
+      />
 
       <AssetList assets={assets} />
     </div>

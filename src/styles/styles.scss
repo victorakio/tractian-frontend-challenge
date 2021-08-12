@@ -6,3 +6,17 @@
     padding: 2rem;
   }
 }
+
+.ant-form {
+  .ant-col {
+    border: none;
+    padding: 0.5rem;
+
+    label {
+      font-weight: 600;
+      width: 15rem;
+      text-align: initial;
+      display: block;
+    }
+  }
+}

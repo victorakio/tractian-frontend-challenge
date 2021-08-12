@@ -1,22 +1,8 @@
 import { useEffect } from "react";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import * as Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-import highchartsMore from "highcharts/highcharts-more.js";
-import solidGauge from "highcharts/modules/solid-gauge.js";
 
-import {
-  Row,
-  Col,
-  Divider,
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  message,
-} from "antd";
+import { Row, Col, Divider, Button, message, Form, Select } from "antd";
 import {
   SettingOutlined,
   TagOutlined,
@@ -29,11 +15,14 @@ import {
 
 import { api } from "../../services/api";
 
-import { formatStatus } from '../../utils/formatStatus';
+import { formatStatus } from "../../utils/formatStatus";
 
 import "./styles.scss";
-highchartsMore(Highcharts);
-solidGauge(Highcharts);
+import EditAssetModal from "../../components/EditAssetModal";
+import { useUnits } from "../../hooks/useUnits";
+import AssetHealthScore from "../../components/AssetHealthScore";
+import Modal from "antd/lib/modal/Modal";
+import { useUsers } from "../../hooks/useUsers";
 
 interface AssetParams {
   assetId: string;
@@ -45,7 +34,8 @@ interface AssetProps {
   model: string;
   sensors: string[];
   status: string;
-  unit: number;
+  unitId: number;
+  companyId: number;
   healthscore: number;
   metrics: {
     lastUptimeAt: string;
@@ -58,31 +48,49 @@ interface AssetProps {
     rpm?: number;
   };
 }
-
-interface UnitProps {
-  id: number;
-  name: string;
-}
-
 function Asset() {
   const [asset, setAsset] = useState<AssetProps>();
-  const [units, setUnits] = useState<UnitProps[]>([]);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const { units } = useUnits();
+
+  const { users } = useUsers();
+
+  const [isEditAssetModalVisible, setIsEditAssetModalVisible] = useState(false);
+
+  const [isAddResponsibleVisible, setIsAddResponsibleVisible] = useState(false);
+
+  const { assetId } = useParams<AssetParams>();
+
+  const status = asset && formatStatus(asset.status);
+
+  const unitName = units.filter((unit) => unit.id === asset?.unitId);
+
+  const formatedUptime = asset && Math.floor(asset.metrics.totalUptime / 3.6);
+
+  const formatedLastUptime =
+    asset && new Date(asset.metrics.lastUptimeAt).toLocaleString();
+
+  const [form] = Form.useForm();
+
+  const { Option } = Select;
+
+  useEffect(() => {
+    api.get(`assets/${assetId}`).then((response) => setAsset(response.data));
+  }, [assetId]);
 
   const showModal = () => {
-    setIsModalVisible(true);
+    setIsEditAssetModalVisible(true);
   };
 
   const handleOk = () => {
-    setIsModalVisible(false);
+    setIsEditAssetModalVisible(false);
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsEditAssetModalVisible(false);
   };
 
-  const onFinish = async (values: any) => {
-    console.log("Success:", values);
+  const handleFinishEditAssetModal = async (values: any) => {
     const editedAsset = {
       sensors: [values.sensors],
       status: values.status,
@@ -96,122 +104,35 @@ function Asset() {
       unitId: values.unitId,
     };
 
-    await api.put(`assets`, editedAsset).then((response) => {
-      console.log(response);
+    await api.put(`assets/${assetId}`, editedAsset).then(() => {
       message.success(`Ativo ${asset?.name} editado com sucesso!`);
     });
   };
 
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
+  const handleFinishFailEditAssetModal = (errorInfo: any) => {
+    message.error("Erro:", errorInfo);
   };
 
-  const { assetId } = useParams<AssetParams>();
+  const showAddResponsibleModal = () => {
+    setIsAddResponsibleVisible(true);
+  };
 
-  useEffect(() => {
-    api.get(`assets/${assetId}`).then((response) => setAsset(response.data));
+  const handleOkResponsibleModal = () => {
+    setIsAddResponsibleVisible(false);
+  };
 
-    api.get("units").then((response) => setUnits(response.data));
-  }, [assetId]);
+  const handleCancelResponsibleModal = () => {
+    setIsAddResponsibleVisible(false);
+  };
 
-  const { Option } = Select;
+  const onFinishAddResponsibleFunction = () => {
+    message.success("Responsável adicionado");
+  };
 
-  function onChange(value: number) {
-    console.log(`selected ${value}`);
-  }
-
-  // let statusIcon;
-  // let formatedStatus;
-
-  // switch (asset?.status) {
-  //   case "inAlert":
-  //     statusIcon = <AlertOutlined />;
-  //     formatedStatus = "Em Alerta";
-  //     break;
-  //   case "inDowntime":
-  //     statusIcon = <StopOutlined />;
-  //     formatedStatus = "Em Parada";
-  //     break;
-  //   case "inOperation":
-  //     statusIcon = <CheckCircleOutlined />;
-  //     formatedStatus = "Ativo";
-  //     break;
-  //   case "default":
-  //     break;
-  // }
-
-  const formatedStatus = asset && formatStatus(asset.status);
-
-
-  console.log(asset);
-  const options = {
-    chart: {
-      type: "solidgauge",
-      backgroundColor: null,
-      tooltip: {
-        enabled: false,
-      },
-      width: 350,
-      spacing: [0, 0, 0, 0],
-      className: "solidgaugeContainer",
-    },
-    title: {
-      text: "Saúde do Ativo",
-      align: "center",
-      style: {
-        fontWeight: 400,
-      },
-    },
-    pane: {
-      center: ["60%", "50%"],
-      size: "100%",
-      startAngle: -90,
-      endAngle: 90,
-      background: {
-        innerRadius: "60%",
-        outerRadius: "100%",
-        shape: "arc",
-      },
-    },
-    plotOptions: {
-      solidgauge: {
-        dataLabels: {
-          y: 5,
-          borderWidth: 0,
-          useHTML: true,
-        },
-      },
-    },
-    yAxis: {
-      stops: [
-        [0.1, "#DF5353"], // green
-        [0.5, "#DDDF0D"], // yellow
-        [0.9, "#55BF3B"], // red
-      ],
-      min: 0,
-      max: 100,
-      lineWidth: 0,
-      tickWidth: 0,
-      minorTickInterval: null,
-      tickAmount: 2,
-      title: {
-        y: -70,
-      },
-      labels: {
-        y: 16,
-      },
-    },
-    series: [
-      {
-        data: [asset?.healthscore],
-        dataLabels: {
-          format:
-            '<span style="font-size: 40px; display: block; text-align: center; line-height: 34px;">{y}</span><br/>' +
-            "<div style='font-size: 20px; text-align: center; line-height: 0px;'>Health Score</div>",
-        },
-        useHTML: true,
-      },
-    ],
+  const handleDeleteAsset = () => {
+    api.delete(`assets/${assetId}`).then(() => {
+      message.success(`Ativo ${asset?.name} excluído com sucesso!`);
+    });
   };
 
   return (
@@ -223,73 +144,17 @@ function Asset() {
             <Button type="link" onClick={showModal}>
               <EditOutlined /> Editar Ativo
             </Button>
-
-            <Modal
-              title={`Editar Ativo ${asset?.name}`}
-              visible={isModalVisible}
-              onOk={handleOk}
-              onCancel={handleCancel}
-            >
-              <Form
-                name="basic"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
-              >
-                <Form.Item label="Nome" name="name">
-                  <Input value={asset?.name} />
-                </Form.Item>
-
-                <Form.Item label="Modelo" name="model">
-                  <Input value={asset?.model} />
-                </Form.Item>
-
-                <Form.Item label="Unidade" name="unitId">
-                  <Select
-                    showSearch
-                    style={{ width: 200 }}
-                    placeholder="Selecione uma unidade"
-                    optionFilterProp="children"
-                    onChange={onChange}
-                    filterOption={(input, option) =>
-                      option?.children
-                        .toLowerCase()
-                        .indexOf(input.toLowerCase()) >= 0
-                    }
-                  >
-                    {units.map((unit) => (
-                      <Option key={unit.id} value={unit.id}>
-                        {unit.name}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-
-                <Form.Item label="Sensores" name="sensors">
-                  <Input value={asset?.sensors} />
-                </Form.Item>
-
-                <Form.Item label="Potência" name="power">
-                  <Input value={asset?.specifications.power} />
-                </Form.Item>
-
-                <Form.Item label="Temperatura Máxima" name="maxTemp,">
-                  <Input value={asset?.specifications.maxTemp} />
-                </Form.Item>
-
-                <Form.Item label="RPM" name="rpm">
-                  <Input value={asset?.specifications.rpm} />
-                </Form.Item>
-
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                  <Button type="primary" htmlType="submit">
-                    Submit
-                  </Button>
-                </Form.Item>
-              </Form>
-            </Modal>
+            {asset && (
+              <EditAssetModal
+                asset={asset}
+                isVisible={isEditAssetModalVisible}
+                onOkFunction={handleOk}
+                onCancelFunction={handleCancel}
+                onFinishFunction={handleFinishEditAssetModal}
+                onFinishFailFunction={handleFinishFailEditAssetModal}
+                form={form}
+              />
+            )}
           </header>
 
           <div>
@@ -303,13 +168,14 @@ function Asset() {
                 {asset?.model}
               </p>
               <p className={`asset${asset?.status}`}>
-                <strong>{formatedStatus?.statusIcon} Status: </strong> {formatedStatus?.formatedStatus}
+                <strong>{status?.statusIcon} Status:</strong>
+                {status?.formatedStatus}
               </p>
               <p>
                 <strong>
                   <HomeOutlined /> Unidade:
                 </strong>
-                {asset?.unit}
+                {unitName[0]?.name}
               </p>
               <p>
                 <strong>
@@ -340,13 +206,67 @@ function Asset() {
               </p>
             </div>
           </div>
+          <Button
+            className="btnAddResponsible"
+            type="primary"
+            onClick={showAddResponsibleModal}
+          >
+            Responsável
+          </Button>
+          <Button danger onClick={handleDeleteAsset}>
+            Excluir ativo
+          </Button>
         </Col>
-        <Col className="solidgaugeContainer">
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </Col>
+        <Col className="metricsContainer">
+          <div className="uptimeContainer">
+            <div className="uptime">
+              <strong>Tempo em funcionamento</strong>
+              <strong>{`${formatedUptime} Horas`}</strong>
+            </div>
 
-        <Col span={12} />
+            <div className="lastUptimeCheck">
+              <strong>Última verificação de funcionamento</strong>
+              <strong>{formatedLastUptime}</strong>
+            </div>
+          </div>
+
+          <hr />
+
+          {asset?.healthscore && (
+            <AssetHealthScore assetScore={asset.healthscore} />
+          )}
+        </Col>
       </Row>
+
+      <Modal
+        visible={isAddResponsibleVisible}
+        onOk={handleOkResponsibleModal}
+        onCancel={handleCancelResponsibleModal}
+      >
+        <Form onFinish={onFinishAddResponsibleFunction} form={form}>
+          <h2>Adicionar responsável</h2>
+
+          <Form.Item label="Responsável" name="responsavel">
+            <Select
+              showSearch
+              style={{ width: 200 }}
+              placeholder="Selecione um responsável"
+            >
+              {users.map((user) => (
+                <Option key={user.id} value={user.id}>
+                  {user.name}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

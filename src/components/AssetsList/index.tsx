@@ -1,7 +1,9 @@
-import { Row, Col } from 'antd';
-import { Link } from 'react-router-dom';
+import { Row, Col } from "antd";
+import { Link } from "react-router-dom";
 
-import './styles.scss';
+import { formatStatus } from "../../utils/formatStatus";
+
+import "./styles.scss";
 
 interface AssetProps {
   id: number;
@@ -24,7 +26,7 @@ function AssetList({ assets }: AssetListProps) {
               <img src={asset.image} alt={asset.name} />
               <div>
                 <h3>{asset.name}</h3>
-                <p>{asset.status}</p>
+                <p>{formatStatus(asset.status).formatedStatus}</p>
               </div>
             </Col>
           </Link>

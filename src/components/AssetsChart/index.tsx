@@ -28,6 +28,7 @@ function AssetsChart({ status, quantities }: AssetsChartProps) {
   const options = {
     chart: {
       type: "pie",
+      backgroundColor: null,
       width: 400,
     },
     title: {
