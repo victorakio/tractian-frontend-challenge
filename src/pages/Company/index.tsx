@@ -91,7 +91,7 @@ function Company() {
                 <strong>Em alerta</strong>
                 <ul>
                   {inAlertAssets.map((asset) => (
-                    <Link to={`assets/${asset.id}`}>
+                    <Link to={`/assets/${asset.id}`}>
                       <li>{asset.name}</li>
                     </Link>
                   ))}
@@ -103,7 +103,7 @@ function Company() {
 
                 <ul>
                   {inDowntimeAssets.map((asset) => (
-                    <Link to={`assets/${asset.id}`}>
+                    <Link to={`/assets/${asset.id}`}>
                       <li>{asset.name}</li>
                     </Link>
                   ))}
